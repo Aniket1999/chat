@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Join | Web-Chat</title>
+        <link rel="shortcut icon" href="https://d3bv2hg4q0qyg2.cloudfront.net/2018/12/08/33b869f90619e81763dbf1fccc896d8d.jpg" type="image/x-icon" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body class="centered-form">
+        <div class="centered-form__form" id="login">
+          <form action="/part.html">
+              <h1>Join A Chat</h1>
+              <input type="text" id="text" name="name" placeholder="Username">
+              <input type="text" id="room" name="room" placeholder="Room">
+              <button class="join">Join</button>
+          </form>
+        </div>
+      <canvas></canvas>
+        <script src="/js/libs/jquery-3.3.1.min.js"></script>
+        <script>
+            $(".se-pre-con").show().delay(2000).fadeOut();
+            const urlParams = new URLSearchParams(window.location.search);
+            const room = urlParams.get('room');
+            if(room){
+              $("#room_wrapper").hide();
+              $("#room").val(room);
+            }
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
+         <script src="/js/bubbles.js"></script>
+    </body>
+</html>

@@ -1,0 +1,208 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Web-Chat</title>
+	<link rel="shortcut icon" href="https://d3bv2hg4q0qyg2.cloudfront.net/2018/12/08/33b869f90619e81763dbf1fccc896d8d.jpg" type="image/x-icon" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/css/emojionearea.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+  <style>
+      body:before {
+        box-shadow:none;
+    }
+  </style>
+
+<body>
+	<div class="chat__sidebar">
+		<div id="users"></div>
+	</div>
+	<section class="msger">
+		<header class="msger-header">
+			<div class="msger-header-title"> <i class="fas fa-comment-alt"></i> Private Chat</div>
+			<div class="msger-header-options dropdown"> <span onclick="myFunction()" class="dropbtn"><i class="fa fa-ellipsis-v"></i></span>
+				<div id="myDropdown" class="dropdown-content">
+					<button id="send-location">Send Location</button>
+					<input type="file" id="imagefile" accept="image/*" class="custom-file-input" style="display:none;">
+					<button class="addfiles">Send Image</button>
+          <input type="file" id="videofile" accept="video/*" class="custom-file-input" style="display:none;">
+          <button class="addvidfiles">Send Video</button>
+          <input type="file" id="attfile" accept=".doc,.docx,.ppt,.pdf,.xls,.pptx" class="custom-file-input" style="display:none;">
+          <button class="addattfiles">Send Document</button>          
+          <button class="invite" data-target="#invite_modal" data-toggle="modal">Send Invite</button>
+				</div>
+			</div>
+		</header>
+    <div id="invite_modal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Invite To Chat Room</h5>
+          </div>
+          <div class="modal-body">
+            <button class="shareBtn btn btn-secondary" onclick="share_email()"><i class="fa fa-envelope"></i> Email</button>
+            <button class="shareBtn btn btn-success" onclick="share_whatsapp()"><i class="fa fa-whatsapp"></i> WhatsApp</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+		<main class="msger-chat">
+			<div id="messages" style="overflow-y: hidden !important;">
+				<script id="message-template" type="text/template">
+					<div class="msg-bubble" style="{{position}}">
+					          <div class="msg-info">
+					            <div class="msg-info-name">{{from}}</div>
+					            <div class="msg-info-time">{{createdAt}}</div>
+					          </div>
+					          <div class="msg-text">
+					            {{{text}}}
+					          </div>
+					        </div>
+				</script>
+        <script id="admin-message-template" type="text/template">
+          <div class="admin_div">
+           <span class="badge badge-pill welcome">{{{text}}}</span>
+          </div>
+        </script>
+        <script id="adminl-message-template" type="text/template">
+          <div class="admin_div">
+           <span class="badge badge-pill leave">{{{text}}}</span>
+          </div>
+        </script>
+				<script id="location-message-template" type="text/template">
+					<div class="msg-bubble" style="{{position}}">
+					          <div class="msg-info">
+					            <div class="msg-info-name">{{from}}</div>
+					            <div class="msg-info-time">{{createdAt}}</div>
+					          </div>
+					          <div class="msg-text">
+					            <p><a href="{{url}}" target="_blank">My current location</a></p>
+					          </div>
+					        </div>
+				</script>
+				<script id="img-message-template" type="text/template">
+					<div class="msg-bubble" style="{{position}}">
+					          <div class="msg-info">
+					            <div class="msg-info-name">{{from}}</div>
+					            <div class="msg-info-time">{{createdAt}}</div>
+					          </div>
+					          <div class="msg-text">
+                    <a href="{{image}}" download>
+					            <img src="{{image}}">
+                    </a>
+					          </div>
+					        </div>
+				</script>
+        <script id="vid-message-template" type="text/template">
+					<div class="msg-bubble" style="{{position}}">
+					          <div class="msg-info">
+					            <div class="msg-info-name">{{from}}</div>
+					            <div class="msg-info-time">{{createdAt}}</div>
+					          </div>
+					          <div class="msg-text">
+					            <video width="320" height="180" controls>
+                        <source src="{{vid}}" type="video/mp4">
+                      </video>
+					          </div>
+					        </div>
+				</script>
+        <script id="att-message-template" type="text/template">
+					<div class="msg-bubble" style="{{position}}">
+					          <div class="msg-info">
+					            <div class="msg-info-name">{{from}}</div>
+					            <div class="msg-info-time">{{createdAt}}</div>
+					          </div>
+					          <div class="msg-text">
+                      <a class="doc" href="{{att}}"><span>Download</span><span>Document</span></a>
+					          </div>
+					        </div>
+				</script>
+			</div>
+		</main>
+		<form class="msger-inputarea" id="message-form">
+			<textarea class="msger-input" id="message_area" name="message" placeholder="Enter your message..." autofocus rows="1"></textarea>
+			<button class="send"><i class="fa fa-send-o"></i>
+			</button>
+		</form>
+	</section>
+  
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/js/libs/jquery-3.3.1.min.js"></script>
+	<script src="/js/libs/deparam.js"></script>
+	<script src="/js/chat.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
+	<script src="/js/libs/moment.js"></script>
+	<script src="/js/libs/mustache.js"></script>
+	<script src="/js/libs/emojionearea.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script>
+		$(document).ready(function(){
+		  $("#message_area").emojioneArea({
+		    pickerPosition: "top"
+		  });
+		})
+	</script>
+	<script>
+		function myFunction() {
+		  document.getElementById("myDropdown").classList.toggle("show");
+		}
+		
+		$('.addfiles').on('click', function() { $('#imagefile').click();return false;});  
+    $('.addvidfiles').on('click', function() { $('#videofile').click();return false;}); 
+    $('.addattfiles').on('click', function() { $('#attfile').click();return false;}); 
+
+		  
+		window.onclick = function(event) {
+		  if (!event.target.matches('.dropbtn')) {
+		    var dropdowns = document.getElementsByClassName("dropdown-content");
+		    var i;
+		    for (i = 0; i < dropdowns.length; i++) {
+		      var openDropdown = dropdowns[i];
+		      if (openDropdown.classList.contains('show')) {
+		        openDropdown.classList.remove('show');
+		      }
+		    }
+		  }
+    }
+    
+    var room_param = document.location.href.split('&')[1];
+    var url = "https://web-chat.glitch.me/index.html?" + room_param;
+    
+    function share_email() {
+        var msgbody = "Hey i am inviting you to join my chat room.\nVisit "+url+" to Join Room!";
+        var subject = "Join Chat Room Invite";
+        msgbody = encodeURIComponent(msgbody);
+        subject = encodeURIComponent(subject);
+        var mail_url = 'https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su='+subject+'&body='+msgbody+'&ui=2&tf=1&pli=1';
+        window.open(mail_url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
+    }
+    
+    function share_whatsapp() {
+        var msgbody = "Hey i am inviting you to join my chat room.\nClick the link below to join me.\n"+url;
+        msgbody = encodeURIComponent(msgbody);
+        if( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)
+        ){
+            var share_url = 'whatsapp://send?text='+msgbody;
+        }
+        else {
+            var share_url = 'https://wa.me/?text='+msgbody;
+        }
+        window.open(share_url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
+    }
+    
+	</script>
+</body>
+
+</html>
